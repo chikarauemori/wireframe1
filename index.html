@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script
+      src="https://kit.fontawesome.com/d0a601627a.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>corundum mama</title>
+
+    <style>
+      div.member {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+      }
+      img {
+        width: 100px;
+        margin-bottom: 30px;
+        float: left;
+      }
+
+      ul.ballon {
+        position: relative;
+        margin: 0 50px;
+        padding: 30px;
+        background: skyblue;
+        border-radius: 30px;
+        width: 50%;
+      }
+
+      ul.ballon:before {
+        content: "";
+        position: absolute;
+        left: -38px;
+        width: 13px;
+        height: 12px;
+        bottom: 0;
+        background: skyblue;
+        border-radius: 50%;
+      }
+
+      ul.ballon:after {
+        content: "";
+        position: absolute;
+        left: -24px;
+        width: 20px;
+        height: 18px;
+        bottom: 3px;
+        border-radius: 50%;
+        background: skyblue;
+      }
+
+      h2.SNS {
+        display: flex;
+        flex-direction: column;
+        margin: 0 50px;
+      }
+      .my-line {
+        color: #00b900;
+        font-size: 150px;
+      }
+
+      .my-insta {
+        background: linear-gradient(
+          45deg,
+          rgba(254, 212, 117, 1) 0%,
+          rgba(229, 61, 93, 1) 50%,
+          rgba(194, 49, 134, 1) 70%,
+          rgba(156, 56, 187, 1) 100%
+        );
+        color: #fff;
+        font-size: 150px;
+        padding: 0px 15px;
+      }
+
+      .my-discord {
+        background: #7289da;
+        color: #fff;
+        font-size: 150px;
+      }
+
+      header {
+        text-align: center;
+      }
+
+      .container {
+        display: flex;
+      }
+
+      aside {
+        position: sticky;
+        top: 0;
+        flex: 1 1 30%;
+        min-width: 150px;
+      }
+
+      main {
+        flex: 1 1 70%;
+      }
+
+      footer {
+        height: 150px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>CORUNDUM MAMA</h1>
+    </header>
+
+    <div class="container">
+      <aside>
+        <!--PC画面ではサイドバー表示 スマホではフッダーに表示させたい-->
+        <nav>
+          <ul>
+            <li><a href="">ホーム</a></li>
+            <li><a href="">活動内容</a></li>
+            <li><a href="">各種SNS</a></li>
+            <li><a href="">よくある質問</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main>
+        <h2>About</h2>
+        <h3>〜CORUNDUM MAMAとは〜</h3>
+        <textarea rows="5" cols="50%">内容入力</textarea>
+
+        <h2><i class="fa fa-external-link"></i> Vision</h2>
+        <h3>〜今後のビジョン〜</h3>
+        <textarea rows="5" cols="50%">内容入力</textarea>
+
+        <h2><i class="fa-solid fa-user-group"></i> Member</h2>
+        <h3>〜運営メンバープロフィール〜</h3>
+        <div class="member">
+          <img src="./メンバー画像.png" />
+
+          <ul class="ballon">
+            <li>名前</li>
+          </ul>
+        </div>
+        <div class="member">
+          <img src="./メンバー画像.png" /><br />
+
+          <ul class="ballon">
+            <li>名前</li>
+          </ul>
+        </div>
+
+        <div class="member">
+          <img src="./メンバー画像.png" />
+
+          <ul class="ballon">
+            <li>名前</li>
+          </ul>
+        </div>
+        <!--カレンダーに予定を入れたい-->
+        <h2><i class="fa fa-calendar"></i> Schedule</h2>
+
+        <div id="calendar" class="calender-wrap"></div>
+
+        <script>
+          fetch("https://docs.google.com/spreadsheets/d//gviz/tq?tqx=out:csv")
+            .then((response) => response.text())
+            .then((csvText) => {
+              const scheduleMap = {};
+
+              const lines = csvText.trim().split("\n");
+              lines.forEach((line) => {
+                const [day, title] = line.split(",");
+                const dayNum = Number(day.trim());
+                if (!isNaN(dayNum)) {
+                  const key = `${dayNum}`;
+                  if (!scheduleMap[key]) scheduleMap[key] = [];
+                  scheduleMap[key].push(title.trim());
+                }
+              });
+
+              generateCalendar(scheduleMap);
+            });
+
+          function generateCalendar(scheduleMap) {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
+            const firstDate = new Date(year, month - 1, 1);
+            const firstDay = firstDate.getDay();
+            const lastDate = new Date(year, month, 0);
+            const lastDayCount = lastDate.getDate();
+
+            let dayCount = 1;
+            let createHtml = "";
+
+            createHtml = "<h1>" + year + "年 " + month + "月</h1>";
+            createHtml += "<table>";
+            createHtml += "<tr>";
+
+            const weeks = ["日", "月", "火", "水", "木", "金", "土"];
+            for (let i = 0; i < weeks.length; i++) {
+              createHtml += "<td>" + weeks[i] + "</td>";
+            }
+
+            createHtml += "</tr>";
+
+            for (let n = 0; n < 6; n++) {
+              createHtml += "<tr>";
+
+              for (let d = 0; d < 7; d++) {
+                if (n == 0 && d < firstDay) {
+                  createHtml += "<td></td>";
+                } else if (dayCount > lastDayCount) {
+                  createHtml += "<td></td>";
+                } else {
+                  const plans = scheduleMap[String(dayCount)] || [];
+                  const planHtml = plans
+                    .map((title) => `<div class="extra-row">${title}</div>`)
+                    .join("");
+                  createHtml += `<td><div class="day-num">${dayCount}</div>${planHtml}</td>`;
+                  dayCount++;
+                }
+              }
+
+              createHtml += "</tr>";
+            }
+            createHtml += "</table>";
+
+            document.querySelector("#calendar").innerHTML = createHtml;
+          }
+        </script>
+        <style>
+          .calender-wrap {
+            font-weight: bold;
+          }
+          table {
+            width: 100%;
+          }
+          .calender-wrap th,
+          td {
+            border: 1px solid #d9d9d9;
+          }
+
+          td {
+            height: 50px;
+          }
+
+          tr td:nth-of-type(1) {
+            color: red;
+          }
+
+          tr td:nth-of-type(7) {
+            color: blue;
+          }
+
+          td {
+            height: auto;
+            vertical-align: top;
+            padding: 4px;
+          }
+
+          .extra-row {
+            font-size: 12px;
+            margin-top: 4px;
+          }
+        </style>
+
+        <h3>〜活動内容〜</h3>
+        <a href="">詳しく活動内容を見る</a><br />
+        <ul>
+          <li>ディスコードで自由にチャット！！</li>
+          <li>毎月オンラインまま会 開催</li>
+        </ul>
+
+        <h2><i class="fa-solid fa-comment"></i> SNS</h2>
+        <a href="">各種SNSの紹介</a><br /><br />
+        <div class="SNS"></div>
+        <a href=""><i class="fa-brands fa-line my-line"></i></a>
+        <a href=""><i class="fa-brands fa-instagram my-insta"></i></a>
+        <a href=""><i class="fa-brands fa-discord my-discord"></i></a>
+
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+      </main>
+    </div>
+
+    <footer>フッター</footer>
+  </body>
+</html>
